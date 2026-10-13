@@ -1,5 +1,8 @@
 # BaM int32 vector addition
 
+For the machine inventory, installation history, compatibility fixes, boot
+configuration, and a handoff for another chat, read [CLUSTER_SETUP.md](CLUSTER_SETUP.md).
+
 `vector_add_bam.cu` creates three SSD-backed BaM `array_t<int32_t>` arrays,
 randomly initializes **all three**, launches `C[i] = A[i] + B[i]`, writes back
 dirty pages, verifies every A/B/C element using a fresh cache, then releases
@@ -79,8 +82,10 @@ After a node reboot, load the BaM module and bind the SSDs again first.
 API inspected against BaM commit `315fadfc5c5c018a64596157bfac94ecbb7d87a2`
 and its pinned freestanding/libcxx dependencies. CUDA object compilation passed
 locally with CUDA 13.0 / GCC 11 targeting `sm_80`; the node build command uses
-your CUDA 12.8 / GCC 12 installation. Linking and hardware execution must be
-performed on the configured node; local validation does not establish SSD
-write correctness on that machine.
+your CUDA 12.8 / GCC 12 installation. Linking and hardware execution subsequently
+succeeded on `sws-2a100-03`: both the small test and the full 40 GiB-per-array run
+verified every A/B/C element through a fresh cache and printed `PASS`.
+Full-size initialization took 91.0164 s, addition plus writeback 220.279 s,
+and verification 169.522 s. See the setup handoff for details and limitations.
 
 Source reference: https://github.com/ZaidQureshi/bam/blob/315fadfc5c5c018a64596157bfac94ecbb7d87a2/include/page_cache.h
